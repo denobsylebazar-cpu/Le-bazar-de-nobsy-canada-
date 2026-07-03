@@ -5,7 +5,70 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Le Bazar de Nobsy — Portail</title>
   <meta name="description" content="Page d'accueil minimaliste pour rediriger vers le site principal Le Bazar de Nobsy">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root{
+      --bg:#0f172a; /* slate-900 */
+      --card:#0b1220;
+      --accent:#ff7a00;
+      --accent-600:#ff8c1a;
+      --muted:rgba(255,255,255,0.75);
+      --glass: rgba(255,255,255,0.04);
+      --radius:14px;
+      --shadow: 0 8px 30px rgba(2,6,23,0.6);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg) 0%, #061226 100%);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .card{
+      width:100%;
+      max-width:820px;
+      background:linear-gradient(180deg,var(--card), rgba(11,18,32,0.88));
+      border-radius:var(--radius);
+      padding:48px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.04);
+    }
+
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    .logo{
+      width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-600));font-weight:700;font-size:24px;color:#fff;flex-shrink:0
+    }
+    h1{margin:0;font-weight:700;font-size:26px;letter-spacing:-0.01em}
+    p.lead{margin:6px 0 0;color:var(--muted);font-size:14px}
+
+    .cta-area{display:flex;gap:16px;align-items:center;margin-top:28px}
+    .cta{
+      appearance:none;border:0;cursor:pointer;padding:18px 28px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-600));color:#08101a;font-weight:700;font-size:18px;display:inline-flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(255,122,0,0.18);transition:transform .14s ease,box-shadow .14s ease,opacity .14s ease;outline:transparent
+    }
+    .cta:focus{box-shadow:0 0 0 4px rgba(255,138,56,0.16);transform:translateY(-1px)}
+    .cta:hover{transform:translateY(-2px)}
+
+    .secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:12px 16px;border-radius:10px;font-weight:600;font-size:14px}
+
+    .meta{margin-top:18px;color:rgba(255,255,255,0.6);font-size:13px}
+
+    footer{margin-top:22px;color:rgba(255,255,255,0.35);font-size:12px}
+
+    @media (max-width:560px){
+      .card{padding:28px}
+      .logo{width:56px;height:56px}
+      h1{font-size:20px}
+      .cta{width:100%;justify-content:center;font-size:16px;padding:16px}
+      .cta-area{flex-direction:column;align-items:stretch}
+    }
+  </style>
 </head>
 <body>
   <main class="card" role="main">
@@ -29,6 +92,38 @@
     </footer>
   </main>
 
-  <script src="script.js" defer></script>
+  <script>
+    (function(){
+      const url = 'https://denobsylebazar-cpu.github.io/Bazar-de-nobsy-/';
+      const visitBtn = document.getElementById('visit');
+      const copyBtn = document.getElementById('copy');
+
+      visitBtn.addEventListener('click', function(){
+        // Open in new tab with noopener to be secure
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+
+      copyBtn.addEventListener('click', async function(){
+        try{
+          await navigator.clipboard.writeText(url);
+          copyBtn.textContent = 'Lien copié ✓';
+          setTimeout(()=>{ copyBtn.textContent = 'Copier le lien'; }, 2200);
+        }catch(e){
+          // fallback
+          const tmp = document.createElement('input');
+          document.body.appendChild(tmp);
+          tmp.value = url; tmp.select();
+          try{ document.execCommand('copy'); copyBtn.textContent = 'Lien copié ✓'; }
+          catch(err){ copyBtn.textContent = 'Échec du copier'; }
+          tmp.remove();
+          setTimeout(()=>{ copyBtn.textContent = 'Copier le lien'; }, 2200);
+        }
+      });
+
+      // Allow Enter on focused button
+      visitBtn.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') visitBtn.click(); });
+      copyBtn.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') copyBtn.click(); });
+    })();
+  </script>
 </body>
 </html>
