@@ -1,90 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr-CA">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Bazar de Nobsy | 3D Retro Gaming</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Bazar de Nobsy | Neon Gaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- FOND 3D THREE.JS -->
-<canvas id="bg3d"></canvas>
-<div class="scanlines"></div>
-
-<div class="category-ribbon-container">
-    <div class="category-ribbon">
-        <div class="ribbon-track">
-            <button class="ribbon-item xbox" onclick="filterByCategory('xbox')">XBOX</button>
-            <button class="ribbon-item ps" onclick="filterByCategory('playstation')">PLAYSTATION</button>
-            <button class="ribbon-item nintendo" onclick="filterByCategory('nintendo')">NINTENDO</button>
-            <button class="ribbon-item console" onclick="filterByCategory('console')">CONSOLES</button>
-            <button class="ribbon-item pop" onclick="filterByCategory('pop')">FUNKO POP</button>
-            <button class="ribbon-item film" onclick="filterByCategory('film')">FILMS</button>
-            <button class="ribbon-item sky" onclick="filterByCategory('skylander')">SKYLANDERS</button>
-            <button class="ribbon-item xbox" onclick="filterByCategory('xbox')">XBOX</button>
-            <button class="ribbon-item ps" onclick="filterByCategory('playstation')">PLAYSTATION</button>
-        </div>
+<!-- TOP PILL RIBBON COMME TON SCREENSHOT -->
+<div class="top-pills">
+    <div class="pills-track">
+        <button onclick="filterByCategory('xbox')">🎮 Xbox</button>
+        <button onclick="filterByCategory('playstation')">🕹️ Playstation</button>
+        <button onclick="filterByCategory('nintendo')">🍄 Nintendo</button>
+        <button onclick="filterByCategory('console')">📦 Consoles</button>
+        <button onclick="filterByCategory('pop')">🧸 Funko Pop</button>
+        <button onclick="filterByCategory('film')">🎬 Films</button>
+        <button onclick="filterByCategory('skylander')">🌀 Skylanders</button>
     </div>
 </div>
 
-<nav class="navbar">
-    <div class="logo-3d"><span class="layer">BAZAR DE NOBSY</span><span class="layer">BAZAR DE NOBSY</span><span class="layer">BAZAR DE NOBSY</span></div>
-    <div class="search-box"><input type="search" id="searchProduct" placeholder="SEARCH..." oninput="searchProducts()"></div>
+<!-- NAVBAR COMME SCREENSHOT -->
+<nav class="navbar-shot">
+    <div class="logo-shot">LE BAZAR DE NOBSY</div>
+    <div class="search-shot">
+        <input type="search" id="searchProduct" placeholder="🔍 Rechercher..." oninput="searchProducts()">
+    </div>
+    <div class="hamburger-shot" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    <ul class="nav-menu" id="navMenu">
+        <li><a href="#accueil">Accueil</a></li>
+        <li><a href="#produits">Produits</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
 </nav>
 
-<header class="hero">
-    <div class="hero-3d-wrap">
-        <h1 class="hero-3d-title" data-text="PLAYER ONE READY?">PLAYER ONE READY?</h1>
-        <p class="hero-subtitle">JOLIETTE // TOIT ROUGE // ARCADE 3D EDITION</p>
-        <button class="btn-3d" onclick="document.getElementById('produits').scrollIntoView({behavior:'smooth'})"><span>INSERT COIN</span></button>
+<!-- HERO CARTE ARRONDI COMME SCREENSHOT MAIS NEON -->
+<header id="accueil" class="hero-shot">
+    <div class="hero-card">
+        <div class="hero-card-bg"></div>
+        <div class="hero-card-content">
+            <h1>Bienvenue au<br><span>Bazar de Nobsy</span></h1>
+            <p>Les meilleurs deals retro gaming à Joliette, Québec<br><b style="color:#00f2ff;">ARCADE 3D EDITION - TOIT ROUGE</b></p>
+            
+            <button class="btn-blue" onclick="document.getElementById('produits').scrollIntoView({behavior:'smooth'})">Voir les produits</button>
+            <button class="btn-white" onclick="window.open('https://www.facebook.com/share/g/18YTkXrkvB/')">Rejoindre le Live</button>
+            <button class="btn-blue" onclick="window.open('https://ruinsnradz.servegame.com/')">Partenariat Ruins'n Radz</button>
+        </div>
     </div>
 </header>
 
+<!-- PRODUITS -->
 <section id="produits">
     <div class="container">
-        <h2 class="section-title">INVENTAIRE // 3D VAULT</h2>
-        <div id="category-back-button" style="display:none; text-align:center;"><button class="btn-3d" onclick="showAllCategories()"><span>← RETOUR</span></button></div>
+        <h2 class="section-title">INVENTAIRE NEON</h2>
+        <div id="category-back-button" style="display:none; text-align:center; margin:20px;"><button class="btn-blue" onclick="showAllCategories()">← Retour catalogue</button></div>
         
-        <div id="xbox"><h3 class="cat-title xbox-neon">XBOX CUBE</h3><div class="products-grid" id="grid-xbox"></div></div>
-        <div id="playstation"><h3 class="cat-title ps-neon">PLAYSTATION CUBE</h3><div class="products-grid" id="grid-playstation"></div></div>
-        <div id="nintendo"><h3 class="cat-title nintendo-neon">NINTENDO CUBE</h3><div class="products-grid" id="grid-nintendo"></div></div>
-        <div id="console"><h3 class="cat-title console-neon">CONSOLE CUBE</h3><div class="products-grid" id="grid-console"></div></div>
-        <div id="pop"><h3 class="cat-title pop-neon">FUNKO POP CUBE</h3><div class="products-grid" id="grid-pop"></div></div>
-        <div id="film"><h3 class="cat-title film-neon">FILM CUBE</h3><div class="products-grid" id="grid-film"></div></div>
-        <div id="skylander"><h3 class="cat-title sky-neon">SKYLANDER CUBE</h3><div class="products-grid" id="grid-skylander"></div></div>
+        <div id="xbox"><h3 class="cat">🎮 XBOX</h3><div class="products-grid" id="grid-xbox"></div></div>
+        <div id="playstation"><h3 class="cat">🕹️ PLAYSTATION</h3><div class="products-grid" id="grid-playstation"></div></div>
+        <div id="nintendo"><h3 class="cat">🍄 NINTENDO</h3><div class="products-grid" id="grid-nintendo"></div></div>
+        <div id="console"><h3 class="cat">📦 CONSOLES</h3><div class="products-grid" id="grid-console"></div></div>
+        <div id="pop"><h3 class="cat">🧸 FUNKO POP</h3><div class="products-grid" id="grid-pop"></div></div>
+        <div id="film"><h3 class="cat">🎬 FILMS</h3><div class="products-grid" id="grid-film"></div></div>
+        <div id="skylander"><h3 class="cat">🌀 SKYLANDERS</h3><div class="products-grid" id="grid-skylander"></div></div>
     </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
-<script>
-// FOND GRID 3D INFINI
-const canvas = document.getElementById('bg3d');
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({canvas, alpha:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-const grid = new THREE.GridHelper(100, 50, 0x00f2ff, 0x220044);
-grid.position.y = -5;
-scene.add(grid);
-camera.position.set(0,5,10);
-camera.lookAt(0,0,0);
-function animate(){ requestAnimationFrame(animate); grid.position.z += 0.15; if(grid.position.z > 2) grid.position.z = 0; renderer.render(scene,camera); }
-animate();
-window.addEventListener('resize', ()=>{ camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
-
-// EFFET 3D TILT SUR LES CARTES
-document.addEventListener('mousemove', (e)=>{
-    document.querySelectorAll('.product-card').forEach(card=>{
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width/2;
-        const y = e.clientY - rect.top - rect.height/2;
-        card.style.transform = `perspective(800px) rotateY(${x/15}deg) rotateX(${-y/15}deg) translateZ(20px)`;
-    });
-});
-</script>
 </body>
 </html>
