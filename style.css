@@ -4,7 +4,7 @@
     box-sizing: border-box;
 }
 
-/* FOND IMMERSIF GAMING 3D */
+/* FOND IMMERSIF GAMING */
 body {
     background-color: #050510;
     color: white;
@@ -47,7 +47,7 @@ body::after {
     z-index: 9999;
 }
 
-/* BARRE DE STATUT LIVE HUD */
+/* BARRE HUD STATUS */
 .hud-status-bar {
     background: rgba(0, 0, 0, 0.95);
     border-bottom: 1px solid rgba(0, 242, 255, 0.3);
@@ -77,7 +77,7 @@ body::after {
     50% { opacity: 0.4; transform: scale(0.85); } 
 }
 
-/* RUBAN DÉFILANT EN BOUCLE INFINIE */
+/* RUBAN DÉFILANT BISEAUTÉ */
 .top-pills {
     background: rgba(8, 8, 26, 0.92);
     backdrop-filter: blur(10px);
@@ -114,7 +114,7 @@ body::after {
     background: rgba(10, 10, 25, 0.9);
     border: 2px solid #00f2ff;
     color: #00f2ff;
-    border-radius: 20px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
     padding: 8px 18px;
     font-weight: 700;
     font-family: 'Orbitron', sans-serif;
@@ -165,7 +165,7 @@ body::after {
     width: 100%;
     background: rgba(20,20,35,0.9);
     border: 2px solid #00f2ff;
-    border-radius: 30px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
     padding: 10px 16px;
     color: white;
     font-weight: 600;
@@ -182,7 +182,6 @@ body::after {
     height: 3px;
     background: #00f2ff;
     margin: 5px 0;
-    border-radius: 3px;
     box-shadow: 0 0 8px #00f2ff;
 }
 
@@ -193,7 +192,6 @@ body::after {
     right: 10px;
     background: #111;
     border: 2px solid #00f2ff;
-    border-radius: 15px;
     list-style: none;
     padding: 10px;
     box-shadow: 0 0 25px #00f2ff;
@@ -213,7 +211,7 @@ body::after {
     font-weight: 700;
 }
 
-/* HERO SECTION */
+/* HERO CARD PRO GAMING (BISEAUTÉE) */
 .hero-shot {
     padding: 25px 15px;
     display: flex;
@@ -228,7 +226,7 @@ body::after {
     min-height: 520px;
     overflow: hidden;
     border: 2px solid #00f2ff;
-    border-radius: 20px;
+    clip-path: polygon(25px 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%, 0 25px);
     box-shadow: 0 0 35px rgba(0, 242, 255, 0.4), 0 25px 50px #000;
     transform: rotateX(3deg);
     transition: 0.4s;
@@ -274,8 +272,8 @@ body::after {
     margin: 15px 0 25px;
     color: #ddd;
     font-size: 14px;
-        }
-/* BOUTONS D'ACCUEIL */
+}
+/* BOUTONS CYBERPUNK BISEAUTÉS */
 .btn-blue {
     width: 100%;
     background: linear-gradient(90deg, #0066cc, #00f2ff);
@@ -287,7 +285,7 @@ body::after {
     font-size: 14px;
     margin: 7px 0;
     cursor: pointer;
-    border-radius: 12px;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
     transition: 0.25s;
     letter-spacing: 1px;
@@ -310,7 +308,7 @@ body::after {
     font-size: 14px;
     margin: 7px 0;
     cursor: pointer;
-    border-radius: 12px;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
     transition: 0.25s;
 }
@@ -322,7 +320,7 @@ body::after {
     box-shadow: 0 0 30px #00f2ff;
 }
 
-/* SECTION TITRE & CATÉGORIES */
+/* SECTION TITRES & CATÉGORIES BISEAUTÉES */
 .section-title {
     font-family: 'Orbitron', sans-serif;
     text-align: center;
@@ -334,15 +332,16 @@ body::after {
 
 .cat {
     font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     margin: 35px 15px 12px;
     padding: 8px 18px;
     border-left: 4px solid #00f2ff;
-    border-radius: 4px;
     color: #00f2ff;
-    background: rgba(10, 10, 25, 0.85);
+    background: rgba(10, 10, 25, 0.9);
     display: inline-block;
     box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+    border: 1px solid rgba(0, 242, 255, 0.4);
+    border-left: 4px solid #00f2ff;
 }
 
 .empty-cat-note {
@@ -353,40 +352,38 @@ body::after {
 }
 
 /* ====================================================
-   GRILLE & CADRES DE PRODUITS (OPTIMISÉS COMME VOTRE PHOTO)
+   GRILLE & CADRES DE PRODUITS BISEAUTÉS (PAS COURBÉS)
 ==================================================== */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
     padding: 0 15px 30px;
 }
 
 .product-card {
-    background: rgba(11, 14, 28, 0.9);
+    background: rgba(10, 12, 25, 0.85);
     border: 2px solid #00f2ff;
-    border-radius: 20px;
-    overflow: hidden;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 242, 255, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
 }
 
 .product-card:hover {
-    border-color: #ff00e5;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 242, 255, 0.5);
 }
 
-/* CADRE DE LA PHOTO : GRANDE TAILLE PARFAITEMENT PROPORTIONNÉE */
+/* CADRE DE LA PHOTO : GRAND ET RECTANGULAIRE NET */
 .card-img-wrap {
     width: 100%;
-    height: 250px;
-    background: #05060d;
+    height: 230px;
+    background: #000;
     overflow: hidden;
     position: relative;
-    border-bottom: 2px solid rgba(0, 242, 255, 0.3);
+    border-bottom: 2px solid rgba(0, 242, 255, 0.4);
 }
 
 .card-img-wrap img {
@@ -398,49 +395,47 @@ body::after {
 }
 
 .product-card:hover .card-img-wrap img {
-    transform: scale(1.06);
+    transform: scale(1.05);
 }
 
-/* BADGE RARETÉ / NOUVEAU */
+/* BADGE RARETÉ BISEAUTÉ */
 .badge-rarete {
     position: absolute;
-    top: 14px;
-    left: 14px;
-    background: rgba(0, 0, 0, 0.85);
+    top: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.9);
     border: 1px solid #ff00e5;
     color: #ff00e5;
     font-size: 9px;
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
     padding: 4px 8px;
-    border-radius: 6px;
     letter-spacing: 1px;
     box-shadow: 0 0 10px #ff00e5;
     z-index: 5;
 }
 
-/* CONTENU TEXTE DE LA CARTE */
+/* CONTENU TEXTE */
 .card-body {
-    padding: 18px 16px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     flex: 1;
-    text-align: center;
+    text-align: left;
 }
 
 .card-title {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
-    color: #00d2ff;
-    margin-bottom: 8px;
-    line-height: 1.3;
+    color: #ffffff;
+    margin-bottom: 6px;
     font-family: 'Poppins', sans-serif;
 }
 
 .card-desc {
-    font-size: 13px;
-    color: #bbb;
-    line-height: 1.45;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.4;
     margin-bottom: 12px;
     flex: 1;
 }
@@ -449,36 +444,35 @@ body::after {
     font-size: 22px;
     font-weight: 900;
     color: #00f2ff;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     font-family: 'Orbitron', sans-serif;
     text-shadow: 0 0 10px #00f2ff;
 }
 
-/* BOUTON COMMANDER */
-.btn-commander {
+/* BOUTON RÉSERVER / COMMANDER CYBERPUNK */
+.btn-commander, .btn-reserver {
     width: 100%;
-    background: linear-gradient(90deg, #0077b6, #00b4d8);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 800;
+    background: rgba(0, 242, 255, 0.1);
+    border: 2px solid #00f2ff;
+    color: #00f2ff;
+    padding: 12px;
     font-family: 'Orbitron', sans-serif;
-    letter-spacing: 1.5px;
+    font-size: 13px;
+    font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 180, 216, 0.4);
-    transition: 0.25s;
+    letter-spacing: 1.5px;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    transition: 0.2s;
+    text-align: center;
 }
 
-.btn-commander:hover {
-    background: linear-gradient(90deg, #0096c7, #00f2ff);
+.btn-commander:hover, .btn-reserver:hover {
+    background: #00f2ff;
     color: #000;
     box-shadow: 0 0 25px #00f2ff;
-    transform: translateY(-2px);
 }
 
-/* BOUTON X DE SUPPRESSION (VISUALISÉ SEULEMENT PAR L'ADMIN) */
+/* BOUTON X DE SUPPRESSION ADMIN */
 .del {
     position: absolute;
     top: 10px;
@@ -505,7 +499,7 @@ body::after {
     background: #cc0033;
 }
 
-/* EXPLORATEUR DE CATÉGORIES & LOCALISATION */
+/* EXPLORATEUR DE CATÉGORIES */
 #catalogue-shot {
     padding: 20px 15px;
     display: flex;
@@ -524,7 +518,7 @@ body::after {
     font-family: 'Orbitron', sans-serif;
     font-size: 14px;
     cursor: pointer;
-    border-radius: 14px;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     box-shadow: 0 0 20px rgba(0, 132, 255, 0.5);
     transition: 0.2s;
 }
@@ -541,7 +535,6 @@ body::after {
     margin-top: 15px;
     background: rgba(10, 10, 22, 0.95);
     border: 2px solid #00f2ff;
-    border-radius: 14px;
     overflow: hidden;
     grid-template-columns: 1fr 1fr;
     box-shadow: 0 0 25px rgba(0, 242, 255, 0.4);
@@ -628,7 +621,6 @@ body::after {
     margin: 0 auto;
     position: relative;
     border: 2px solid #00f2ff;
-    border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 0 35px rgba(0, 242, 255, 0.3), 0 20px 40px #000;
 }
@@ -641,7 +633,6 @@ body::after {
     border: 1px solid #00f2ff;
     color: #00f2ff;
     padding: 8px 14px;
-    border-radius: 6px;
     font-family: 'Orbitron', sans-serif;
     font-weight: 800;
     font-size: 11px;
@@ -661,7 +652,7 @@ body::after {
     letter-spacing: 2px;
 }
 
-/* PANNEAU ADMIN, POPUP & FORMULAIRE */
+/* BOUTON FLOTTANT & POPUP ADMIN */
 #btnAdmin {
     position: fixed;
     bottom: 15px;
@@ -693,6 +684,7 @@ body::after {
 .popup {
     background: #0d0f1e;
     border: 2px solid #00f2ff;
+    clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
     padding: 22px;
     box-shadow: 0 0 40px rgba(0, 242, 255, 0.4);
 }
@@ -707,37 +699,29 @@ body::after {
     outline: none;
     font-family: inherit;
     font-size: 13px;
-    transition: border-color 0.2s;
 }
 
 .popup input:focus, .popup select:focus, .popup textarea:focus {
     border-color: #00f2ff;
 }
 
-/* BOUTON SUPPRESSION MULTIPLE & TABLEAU */
 .btn-del-batch {
     background: #ff0044;
     color: white;
     border: none;
     padding: 8px 14px;
-    border-radius: 8px;
     font-weight: 700;
     font-size: 11px;
     font-family: 'Orbitron', sans-serif;
     cursor: pointer;
     box-shadow: 0 0 10px rgba(255, 0, 68, 0.4);
-    transition: 0.2s;
-}
-
-.btn-del-batch:hover:not(:disabled) {
-    background: #cc0033;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
 }
 
 .table-container {
     max-height: 240px;
     overflow-y: auto;
     border: 1px solid #1a1e36;
-    border-radius: 8px;
     margin-top: 8px;
 }
 
@@ -767,6 +751,5 @@ body::after {
     width: 38px;
     height: 38px;
     object-fit: cover;
-    border-radius: 6px;
     border: 1px solid #00f2ff;
-}
+                                }
