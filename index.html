@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Bazar de Nobsy - NEON GAMING 3D</title>
+    <title>Le Bazar de Nobsy -  GAMING </title>
     <!-- Polices Google -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- Feuille de style CSS -->
@@ -85,22 +85,54 @@
     <!-- BOUTON FLOTTANT ADMIN -->
     <button id="btnAdmin" onclick="openAdmin()" title="Espace Administrateur">⚙️</button>
 
-    <!-- POPUP ADMIN AVEC ONGLETS & TABLEAU SUPPRESSION MULTIPLE -->
+    <!-- POPUP ADMIN CONFORME À VOTRE PHOTO -->
     <div id="popupAdmin">
-        <div class="popup" style="max-width:540px;width:95%">
-            <h3 style="color:#00f2ff;font-family:'Orbitron';text-align:center;margin-bottom:12px">PANNEAU ADMIN 3D</h3>
-            
-            <!-- Onglets -->
-            <div style="display:flex;gap:8px;margin-bottom:12px">
-                <button id="btnTabList" class="tab-btn active-tab" onclick="switchAdminTab('list')">📋 Inventaire (<span id="adminTotalCount">0</span>)</button>
-                <button id="btnTabAdd" class="tab-btn" onclick="switchAdminTab('add')">➕ Ajouter un article</button>
-                <button class="tab-btn" onclick="closeAdmin()" style="margin-left:auto;border-color:#ff0044;color:#ff0044">✕</button>
+        <div class="popup" style="max-width:540px;width:95%;max-height:90vh;overflow-y:auto;border-radius:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+                <h3 style="color:#00f2ff;font-family:'Orbitron';">ESPACE ADMIN</h3>
+                <button onclick="closeAdmin()" style="background:transparent;border:2px solid #ff0044;color:#ff0044;width:34px;height:34px;border-radius:50%;font-weight:900;cursor:pointer">✕</button>
             </div>
 
-            <!-- Onglet 1 : Tableau d'inventaire avec cases à cocher -->
-            <div id="tabList">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0">
-                    <button id="btnBatchDelete" class="btn-del-batch" onclick="deleteSelectedBatch()" disabled>🗑️ Supprimer la sélection (0)</button>
+            <!-- TABLEAU ÉTAT DE LA BASE (1 SEULE BASE, LIMITE 80) -->
+            <div class="db-status-card" style="background:rgba(15,20,35,0.9);border:2px solid #00f2ff;border-radius:12px;padding:15px;margin-bottom:20px;">
+                <h4 style="font-size:16px;font-weight:800;color:#fff;margin-bottom:10px;">📊 État des bases de données</h4>
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #00f2ff;color:#00f2ff;font-family:'Orbitron';text-align:left;">
+                            <th style="padding:6px 0;">Base</th>
+                            <th style="padding:6px 0;text-align:right;">Produits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding:10px 0;color:#ddd;">Supabase (limite 80)</td>
+                            <td id="dbCountText" style="padding:10px 0;text-align:right;font-weight:900;color:#00ff66;font-family:'Orbitron';">0 / 80</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:11px;color:#888;margin-top:8px;">Les nouveaux produits vont dans Supabase jusqu'à 80 produits.</p>
+            </div>
+
+            <!-- FORMULAIRE AJOUTER UN PRODUIT -->
+            <h3 style="font-size:22px;font-weight:900;margin-bottom:12px;color:#fff;text-align:left;">Ajouter un produit</h3>
+            <input id="nom" placeholder="Nom du produit" required style="border-radius:10px;">
+            <textarea id="desc" placeholder="Description" rows="3" style="border-radius:10px;"></textarea>
+            <input id="prix" type="number" placeholder="Prix $" step="0.01" required style="border-radius:10px;">
+            
+            <div style="margin:10px 0;text-align:left;">
+                <label style="font-size:13px;font-weight:700;display:block;margin-bottom:6px;color:#00f2ff;">📷 Photo :</label>
+                <input id="img" type="file" accept="image/*" style="border:1px solid #333;padding:8px;border-radius:8px;">
+                <img id="preview" style="display:none;width:100%;height:140px;object-fit:cover;border-radius:8px;margin-top:8px;border:2px solid #00f2ff">
+            </div>
+
+            <select id="cat" required style="border-radius:10px;"><option value="">Choisir la catégorie...</option></select>
+            <button class="btn-commander" onclick="addProduct()" style="margin-top:14px;border-radius:12px;padding:15px;font-size:15px;">🚀 Publier</button>
+
+            <!-- SECTION SUPPRESSION MULTIPLE (SÉLECTION PAR CASES À COCHER) -->
+            <div style="margin-top:25px;border-top:2px solid #1a1a35;padding-top:15px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <h4 style="color:#00f2ff;font-family:'Orbitron';font-size:12px;">INVENTAIRE & SÉLECTION</h4>
+                    <button id="btnBatchDelete" class="btn-del-batch" onclick="deleteSelectedBatch()" disabled>🗑️ Supprimer sélection (0)</button>
                 </div>
                 <div class="table-container">
                     <table class="admin-table">
@@ -113,23 +145,9 @@
                                 <th>Prix</th>
                             </tr>
                         </thead>
-                        <tbody id="adminTableBody">
-                            <!-- Rempli en JS -->
-                        </tbody>
+                        <tbody id="adminTableBody"></tbody>
                     </table>
                 </div>
-            </div>
-
-            <!-- Onglet 2 : Formulaire d'ajout -->
-            <div id="tabAdd" style="display:none">
-                <input id="nom" placeholder="Nom du produit" required>
-                <textarea id="desc" placeholder="Description du produit" rows="3"></textarea>
-                <input id="prix" type="number" placeholder="Prix ($ CAD)" step="0.01" required>
-                <select id="cat" required><option value="">Sélectionner une catégorie...</option></select>
-                <label style="font-size:11px;color:#00f2ff;display:block;margin-top:6px">📷 Photo du produit</label>
-                <input id="img" type="file" accept="image/*">
-                <img id="preview" style="display:none;width:100%;height:130px;object-fit:cover;border-radius:6px;margin-top:8px;border:2px solid #00f2ff">
-                <button class="btn-blue" onclick="addProduct()" style="margin-top:14px">PUBLIER EN LIGNE</button>
             </div>
         </div>
     </div>
