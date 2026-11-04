@@ -8,19 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- Feuille de style CSS -->
     <link rel="stylesheet" href="style.css">
-    <!-- Librairie Supabase JS Client -->
+    <!-- Librairie Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="scan"></div>
 
-    <!-- BARRE HUD STATUS -->
-    <div class="hud-status-bar">
-        <div><span class="hud-dot"></span>LOCAL OUVERT • MARCHÉ TOIT ROUGE</div>
-        <div style="color:#00f2ff">EDITION 3D PRO</div>
-    </div>
-
-    <!-- RUBAN DÉFILANT EN BOUCLE INFINIE -->
+    <!-- RUBAN DÉFILANT -->
     <div class="top-pills">
         <div class="pills-track" id="pillsTrack1"></div>
         <div class="pills-track" id="pillsTrack2"></div>
@@ -61,7 +55,7 @@
     <!-- SECTION PRODUITS -->
     <section id="produits">
         <h2 class="section-title" id="mainTitle">INVENTAIRE NEON</h2>
-        <div style="text-align:center; margin-bottom: 20px;">
+        <div style="text-align:center;margin-bottom:20px">
             <button id="backBtn" style="display:none" class="btn-white" onclick="showAll()">← Voir tout le catalogue</button>
         </div>
         <div id="allCats"></div>
@@ -88,27 +82,59 @@
     <!-- PIED DE PAGE -->
     <footer class="footer-shot">© 2026 Le bazar de Nobsy - Joliette. INSERT COIN TO CONTINUE</footer>
 
-    <!-- BOUTON & POPUP ADMIN -->
+    <!-- BOUTON FLOTTANT ADMIN -->
     <button id="btnAdmin" onclick="openAdmin()" title="Espace Administrateur">⚙️</button>
+
+    <!-- POPUP ADMIN AVEC ONGLETS & TABLEAU SUPPRESSION MULTIPLE -->
     <div id="popupAdmin">
-        <div class="popup">
-            <h3 style="color:#00f2ff;font-family:'Orbitron';text-align:center;margin-bottom:10px">PANNEAU ADMIN 3D</h3>
-            <input id="nom" placeholder="Nom du produit" required>
-            <textarea id="desc" placeholder="Description" rows="2"></textarea>
-            <input id="prix" type="number" placeholder="Prix ($ CAD)" step="0.01" required>
-            <select id="cat" required><option value="">Sélectionner une catégorie...</option></select>
-            <label style="font-size:11px;color:#00f2ff;display:block;margin-top:6px">📷 Photo du produit</label>
-            <input id="img" type="file" accept="image/*">
-            <img id="preview" style="display:none;width:100%;height:120px;object-fit:cover;border-radius:6px;margin-top:8px;border:2px solid #00f2ff">
+        <div class="popup" style="max-width:540px;width:95%">
+            <h3 style="color:#00f2ff;font-family:'Orbitron';text-align:center;margin-bottom:12px">PANNEAU ADMIN 3D</h3>
             
-            <div style="display:flex;gap:8px;margin-top:14px">
-                <button class="btn-blue" onclick="addProduct()" style="flex:1">PUBLIER EN LIGNE</button>
-                <button class="btn-white" onclick="closeAdmin()" style="flex:1">FERMER</button>
+            <!-- Onglets -->
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+                <button id="btnTabList" class="tab-btn active-tab" onclick="switchAdminTab('list')">📋 Inventaire (<span id="adminTotalCount">0</span>)</button>
+                <button id="btnTabAdd" class="tab-btn" onclick="switchAdminTab('add')">➕ Ajouter un article</button>
+                <button class="tab-btn" onclick="closeAdmin()" style="margin-left:auto;border-color:#ff0044;color:#ff0044">✕</button>
+            </div>
+
+            <!-- Onglet 1 : Tableau d'inventaire avec cases à cocher -->
+            <div id="tabList">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0">
+                    <button id="btnBatchDelete" class="btn-del-batch" onclick="deleteSelectedBatch()" disabled>🗑️ Supprimer la sélection (0)</button>
+                </div>
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width:30px"><input type="checkbox" onchange="toggleSelectAll(this)" title="Tout cocher"></th>
+                                <th style="width:45px">Photo</th>
+                                <th>Nom</th>
+                                <th>Cat.</th>
+                                <th>Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <!-- Rempli en JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Onglet 2 : Formulaire d'ajout -->
+            <div id="tabAdd" style="display:none">
+                <input id="nom" placeholder="Nom du produit" required>
+                <textarea id="desc" placeholder="Description du produit" rows="3"></textarea>
+                <input id="prix" type="number" placeholder="Prix ($ CAD)" step="0.01" required>
+                <select id="cat" required><option value="">Sélectionner une catégorie...</option></select>
+                <label style="font-size:11px;color:#00f2ff;display:block;margin-top:6px">📷 Photo du produit</label>
+                <input id="img" type="file" accept="image/*">
+                <img id="preview" style="display:none;width:100%;height:130px;object-fit:cover;border-radius:6px;margin-top:8px;border:2px solid #00f2ff">
+                <button class="btn-blue" onclick="addProduct()" style="margin-top:14px">PUBLIER EN LIGNE</button>
             </div>
         </div>
     </div>
 
-    <!-- Script JS -->
+    <!-- Script JavaScript -->
     <script src="script.js"></script>
 </body>
-    </html>
+</html>
