@@ -430,3 +430,9 @@ async function deleteSingleProd(id) {
 
 // Lancement au chargement de la page
 init();
+// FERMETURE DE L'ADMIN & DISPARITION DES 'X' (REMPLACEMENT)
+function closeAdmin() { 
+    document.getElementById('popupAdmin').style.display = 'none'; 
+    isAdminLoggedIn = false; // Déconnecte l'administrateur
+    render(globalProducts);  // Fait disparaître tous les 'X' des cartes immédiatement
+}
