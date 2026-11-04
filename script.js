@@ -1,16 +1,15 @@
 // ==========================================
-// 1. CONFIGURATION SUPABASE & CLIENT
+// 1. CONFIGURATION SUPABASE
 // ==========================================
 const SUPABASE_URL = "https://wwlqxdevydyvjuvnlpqf.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3bHF4ZGV2eWR5dmp1dm5scHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM4MDgxOTMsImV4cCI6MjEwOTM4NDE5M30.EpR_eZtmHLGy67E6zrHbL-0ScVS7rA_O8gIbjSgcfYY";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let isAdminLoggedIn = false;
+let isAdminLoggedIn = false; // Reste à FALSE par défaut (aucun X visible pour les visiteurs)
 let globalProducts = [];
-let selectedProductIds = new Set(); // Contient les IDs des articles cochés
+let selectedProductIds = new Set();
 
-// Catégories officielles du site
 const CATS = [
     { id: 'xbox', label: 'XBOX', emoji: '🎮' },
     { id: 'playstation', label: 'PLAYSTATION', emoji: '🕹️' },
@@ -22,7 +21,7 @@ const CATS = [
 ];
 
 // ==========================================
-// 2. RÉCUPÉRATION SUPABASE (MAX 80 - NOUVEAUX EN PREMIER)
+// 2. RÉCUPÉRATION SUPABASE (LIMITE 80 - NOUVEAUX EN PREMIER)
 // ==========================================
 async function fetchProducts() {
     try {
@@ -59,7 +58,7 @@ function setupPillsAndCategories() {
 
     let pillsHTML = '';
     catContent.innerHTML = '';
-    catSelect.innerHTML = '<option value="">Sélectionner une catégorie...</option>';
+    catSelect.innerHTML = '<option value="">Choisir la catégorie...</option>';
 
     CATS.forEach(c => {
         pillsHTML += `<button onclick="filterCat('${c.id}')">${c.emoji} ${c.label}</button>`;
@@ -73,21 +72,29 @@ function setupPillsAndCategories() {
 
 async function reloadAndRender() {
     globalProducts = await fetchProducts();
+    updateDatabaseStatus();
     render(globalProducts);
     if (isAdminLoggedIn) {
         renderAdminTable();
     }
 }
 
+function updateDatabaseStatus() {
+    const countEl = document.getElementById('dbCountText');
+    if (countEl) {
+        countEl.innerText = `${globalProducts.length} / 80`;
+    }
+}
+
 // ==========================================
-// 4. RENDU : FORMAT LARGE & CATÉGORIES VIDES À LA FIN
+// 4. RENDU DES ARTICLES
 // ==========================================
 function render(productsList) {
     const allCatsDiv = document.getElementById('allCats');
     if (!allCatsDiv) return;
     allCatsDiv.innerHTML = '';
 
-    // Tri dynamique : Catégories avec stock d'abord, catégories vides à la fin
+    // Tri dynamique : Catégories avec articles au début, catégories vides tout à la fin
     const sortedCats = [...CATS].sort((a, b) => {
         const countA = productsList.filter(p => p.categorie === a.id).length;
         const countB = productsList.filter(p => p.categorie === b.id).length;
@@ -117,8 +124,13 @@ function render(productsList) {
                 const badgeHTML = p.badge ? `<div class="badge-rarete">${p.badge}</div>` : '';
                 const msgLink = `https://www.facebook.com/share/g/18YTkXrkvB/`;
 
+                // LA CROIX 'X' APPARAÎT SEULEMENT SI L'ADMIN EST CONNECTÉ
+                const deleteBtnHTML = isAdminLoggedIn 
+                    ? `<button class="del" onclick="deleteSingleProd('${p.id}')" title="Supprimer">✕</button>` 
+                    : '';
+
                 card.innerHTML = `
-                    <button class="del" onclick="deleteSingleProd('${p.id}')" title="Supprimer">✕</button>
+                    ${deleteBtnHTML}
                     ${badgeHTML}
                     <div class="card-img-wrap">
                         <img src="${p.image}" onerror="this.src='https://via.placeholder.com/400x300?text=AUCUNE+IMAGE'">
@@ -131,7 +143,7 @@ function render(productsList) {
                     </div>
                 `;
 
-                // Effet 3D Gaming
+                // Effet 3D
                 card.addEventListener('mousemove', e => {
                     const r = card.getBoundingClientRect();
                     const x = e.clientX - r.left - r.width / 2;
@@ -185,7 +197,7 @@ function toggleMenu() { document.getElementById('navMenu').classList.toggle('ope
 function toggleCatalogue() { document.getElementById('catContent').classList.toggle('open'); }
 
 // ==========================================
-// 6. ZONE ADMIN (CODE SÉCURISÉ CÔTÉ SUPABASE)
+// 6. ZONE ADMIN (VÉRIFICATION SÉCURISÉE SUPABASE)
 // ==========================================
 async function checkAdminAccess() {
     if (isAdminLoggedIn) return true;
@@ -193,7 +205,7 @@ async function checkAdminAccess() {
     if (!code) return false;
 
     try {
-        // Le code est validé sur Supabase : invisible dans la console !
+        // Vérification sur le serveur Supabase (le code 200511 est invisible sur la console !)
         const { data: isValid, error } = await supabaseClient.rpc('verifier_admin', { 
             code_saisi: code.trim() 
         });
@@ -202,16 +214,17 @@ async function checkAdminAccess() {
 
         if (isValid === true) {
             isAdminLoggedIn = true;
+            render(globalProducts); // Fait apparaître les 'X' sur toutes les cartes
             return true;
         } else {
             alert("Code administrateur incorrect !");
             return false;
         }
     } catch (err) {
-        console.error("Erreur serveur :", err.message);
-        // Secours si la fonction RPC n'a pas encore été créée dans Supabase
+        // Secours si RPC n'est pas encore configurée
         if (code.trim() === "200511") {
             isAdminLoggedIn = true;
+            render(globalProducts); // Fait apparaître les 'X'
             return true;
         }
         alert("Accès refusé.");
@@ -224,7 +237,7 @@ async function openAdmin() {
     if (!isAuthorized) return;
     
     document.getElementById('popupAdmin').style.display = 'flex';
-    switchAdminTab('list');
+    updateDatabaseStatus();
     renderAdminTable();
 }
 
@@ -232,14 +245,7 @@ function closeAdmin() {
     document.getElementById('popupAdmin').style.display = 'none'; 
 }
 
-function switchAdminTab(tab) {
-    document.getElementById('tabAdd').style.display = (tab === 'add') ? 'block' : 'none';
-    document.getElementById('tabList').style.display = (tab === 'list') ? 'block' : 'none';
-    document.getElementById('btnTabAdd').classList.toggle('active-tab', tab === 'add');
-    document.getElementById('btnTabList').classList.toggle('active-tab', tab === 'list');
-}
-
-// Prévisualisation photo
+// Prévisualisation d'image
 document.getElementById('img').addEventListener('change', e => {
     const file = e.target.files[0];
     if (!file) return;
@@ -252,8 +258,13 @@ document.getElementById('img').addEventListener('change', e => {
     reader.readAsDataURL(file);
 });
 
-// Ajout avec envoi direct vers le bucket 'photos'
+// Ajout avec contrôle de la limite de 80 produits
 async function addProduct() {
+    if (globalProducts.length >= 80) {
+        alert("Limite de 80 produits atteinte sur Supabase ! Veuillez supprimer d'anciens articles.");
+        return;
+    }
+
     const nom = document.getElementById('nom').value.trim();
     const desc = document.getElementById('desc').value.trim();
     const prix = parseFloat(document.getElementById('prix').value);
@@ -268,7 +279,7 @@ async function addProduct() {
 
     let imgSrc = 'https://via.placeholder.com/400x300?text=' + encodeURIComponent(nom);
 
-    // 1. Upload vers le bucket Supabase 'photos'
+    // Upload dans le bucket 'photos'
     if (file) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
@@ -283,7 +294,6 @@ async function addProduct() {
         imgSrc = urlData.publicUrl;
     }
 
-    // 2. Création de l'article (placé automatiquement en tête grâce à created_at)
     const newProduct = {
         nom,
         badge: 'NOUVEAU',
@@ -297,14 +307,14 @@ async function addProduct() {
     try {
         const { error } = await supabaseClient.from('produits').insert([newProduct]);
         if (error) throw error;
-        alert("Article publié avec succès !");
+        alert("Article publié avec succès sur Supabase !");
     } catch (err) {
-        console.warn("Erreur Supabase insert :", err.message);
+        console.warn("Erreur Supabase :", err.message);
         globalProducts.unshift({ id: Date.now().toString(), ...newProduct });
         localStorage.setItem('bazarNobsy_3D', JSON.stringify(globalProducts));
     }
 
-    // Réinitialisation
+    // Réinitialisation du formulaire
     document.getElementById('nom').value = '';
     document.getElementById('desc').value = '';
     document.getElementById('prix').value = '';
@@ -313,22 +323,21 @@ async function addProduct() {
     document.getElementById('preview').style.display = 'none';
 
     await reloadAndRender();
-    switchAdminTab('list');
 }
 
-// Rendu du tableau d'inventaire Admin (limité à 80)
+// ==========================================
+// 7. GESTION DU TABLEAU & SUPPRESSION MULTIPLE
+// ==========================================
 function renderAdminTable() {
     const tableBody = document.getElementById('adminTableBody');
-    const countEl = document.getElementById('adminTotalCount');
     if (!tableBody) return;
 
-    countEl.innerText = `${globalProducts.length} / 80 articles`;
     tableBody.innerHTML = '';
     selectedProductIds.clear();
     updateBatchDeleteBtn();
 
     if (globalProducts.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:15px;color:#888;">Aucun article dans Supabase.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:15px;color:#888;">Aucun article dans la base de données.</td></tr>`;
         return;
     }
 
@@ -345,7 +354,6 @@ function renderAdminTable() {
     });
 }
 
-// Sélection multiple
 function toggleSelectProduct(id, isChecked) {
     if (isChecked) {
         selectedProductIds.add(id);
@@ -372,18 +380,18 @@ function updateBatchDeleteBtn() {
     const count = selectedProductIds.size;
     const btn = document.getElementById('btnBatchDelete');
     if (btn) {
-        btn.innerText = `🗑️ Supprimer la sélection (${count})`;
+        btn.innerText = `🗑️ Supprimer sélection (${count})`;
         btn.disabled = count === 0;
         btn.style.opacity = count === 0 ? "0.4" : "1";
     }
 }
 
-// SUPPRESSION EN MASSE SUPABASE
+// SUPPRESSION MULTIPLE (SÉLECTION PAR CASES À COCHER)
 async function deleteSelectedBatch() {
     if (selectedProductIds.size === 0) return;
     const count = selectedProductIds.size;
 
-    if (!confirm(`Confirmer la suppression de ces ${count} articles de Supabase ?`)) return;
+    if (!confirm(`Voulez-vous supprimer ces ${count} articles de Supabase ?`)) return;
 
     const idsToDelete = Array.from(selectedProductIds);
 
@@ -394,9 +402,9 @@ async function deleteSelectedBatch() {
             .in('id', idsToDelete);
 
         if (error) throw error;
-        alert(`${count} articles ont été supprimés !`);
+        alert(`${count} articles ont été supprimés avec succès !`);
     } catch (err) {
-        console.warn("Erreur suppression Supabase :", err.message);
+        console.warn("Erreur suppression :", err.message);
         globalProducts = globalProducts.filter(p => !selectedProductIds.has(String(p.id)));
         localStorage.setItem('bazarNobsy_3D', JSON.stringify(globalProducts));
     }
@@ -405,12 +413,10 @@ async function deleteSelectedBatch() {
     await reloadAndRender();
 }
 
-// Suppression individuelle
+// SUPPRESSION INDIVIDUELLE (BOUTON X SUR LA CARTE)
 async function deleteSingleProd(id) {
-    const isAuthorized = await checkAdminAccess();
-    if (!isAuthorized) return;
-    
-    if (!confirm('Supprimer cet article ?')) return;
+    if (!isAdminLoggedIn) return;
+    if (!confirm('Voulez-vous supprimer cet article ?')) return;
 
     try {
         const { error } = await supabaseClient.from('produits').delete().eq('id', id);
@@ -422,5 +428,5 @@ async function deleteSingleProd(id) {
     await reloadAndRender();
 }
 
-// Démarrage
+// Lancement au chargement de la page
 init();
