@@ -760,3 +760,7 @@ body::after {
         url('bazar.jpg') center/cover no-repeat !important;
     filter: brightness(0.85);
 }
+/* SUPPRIMER L'ÉTIQUETTE NOUVEAU SUR LES PHOTOS */
+.badge-rarete {
+    display: none !important;
+}
