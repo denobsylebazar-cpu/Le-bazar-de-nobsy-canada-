@@ -753,3 +753,10 @@ body::after {
     object-fit: cover;
     border: 1px solid #00f2ff;
                                 }
+/* --- PHOTO EN FOND DU CADRE D'ACCUEIL --- */
+.hero-card .hero-card-bg {
+    background: 
+        linear-gradient(rgba(5, 5, 16, 0.55), rgba(5, 5, 16, 0.80)), 
+        url('bazar.jpg') center/cover no-repeat !important;
+    filter: brightness(0.85);
+}
