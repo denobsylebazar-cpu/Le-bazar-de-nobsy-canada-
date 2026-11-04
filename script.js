@@ -1,205 +1,302 @@
-// CONFIG SUPABASE - garde tes clés à toi
-const SUPABASE_URL = "https://TON_URL.supabase.co";
-const SUPABASE_KEY = "TA_CLE_ANON";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ==========================================
+// 1. CONFIGURATION SUPABASE & ADMIN
+// ==========================================
+const SUPABASE_URL = "https://wwlqxdevydyvjuvnlpqf.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3bHF4ZGV2eWR5dmp1dm5scHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM4MDgxOTMsImV4cCI6MjEwOTM4NDE5M30.EpR_eZtmHLGy67E6zrHbL-0ScVS7rA_O8gIbjSgcfYY";
 
-const CATEGORIES = ['xbox','playstation','nintendo','console','pop','film','skylander'];
-let allProducts = [];
-let selectedProducts = new Set();
+// Initialisation du client Supabase
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- INIT ---
-document.addEventListener('DOMContentLoaded', async ()=>{
-    await loadProducts();
-    setupPreview();
-});
+// Code Admin demandé
+const ADMIN_CODE = "200511";
+let isAdminLoggedIn = false;
 
-async function loadProducts(){
-    const { data, error } = await supabaseClient.from('produits').select('*').order('created_at',{ascending:false});
-    if(error){ console.error(error); return; }
-    allProducts = data || [];
-    renderAll();
+// Catégories du Bazar
+const CATS = [
+    { id: 'xbox', label: 'XBOX', emoji: '🎮' },
+    { id: 'playstation', label: 'PLAYSTATION', emoji: '🕹️' },
+    { id: 'nintendo', label: 'NINTENDO', emoji: '🍄' },
+    { id: 'console', label: 'CONSOLES', emoji: '📦' },
+    { id: 'pop', label: 'FUNKO POP', emoji: '🧸' },
+    { id: 'film', label: 'FILMS', emoji: '🎬' },
+    { id: 'skylander', label: 'SKYLANDERS', emoji: '🌀' },
+];
+
+let globalProducts = [];
+
+// ==========================================
+// 2. RÉCUPÉRATION DES PRODUITS (NOUVEAU EN PREMIER)
+// ==========================================
+async function fetchProducts() {
+    try {
+        // Tri décroissant pour placer les nouveautés en premier
+        const { data, error } = await supabaseClient
+            .from('produits')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    } catch (err) {
+        console.warn("Erreur Supabase (table 'produits'): ", err.message);
+        // Secours si la table distante n'est pas encore créée
+        const stored = localStorage.getItem('bazarNobsy_3D');
+        return stored ? JSON.parse(stored) : [];
+    }
 }
 
-function renderAll(list = allProducts){
-    // vide toutes les grilles
-    CATEGORIES.forEach(cat => {
-        const grid = document.getElementById(`grid-${cat}`);
-        if(grid) grid.innerHTML = "";
+// ==========================================
+// 3. INITIALISATION DE LA PAGE
+// ==========================================
+async function init() {
+    setupPillsAndCategories();
+    await reloadAndRender();
+}
+
+function setupPillsAndCategories() {
+    const pills1 = document.getElementById('pillsTrack1');
+    const pills2 = document.getElementById('pillsTrack2');
+    const catContent = document.getElementById('catContent');
+    const catSelect = document.getElementById('cat');
+    
+    let pillsHTML = '';
+    catContent.innerHTML = '';
+    catSelect.innerHTML = '<option value="">Sélectionner une catégorie...</option>';
+
+    CATS.forEach(c => {
+        pillsHTML += `<button onclick="filterCat('${c.id}')">${c.emoji} ${c.label}</button>`;
+        catContent.innerHTML += `<a onclick="filterCat('${c.id}');toggleCatalogue()">${c.emoji} ${c.label}</a>`;
+        catSelect.innerHTML += `<option value="${c.id}">${c.label}</option>`;
     });
 
-    if(list.length === 0){
-        document.getElementById('grid-xbox').innerHTML = "<p style='color:#666'>Aucun produit</p>";
+    pills1.innerHTML = pillsHTML;
+    pills2.innerHTML = pillsHTML;
+}
+
+async function reloadAndRender() {
+    globalProducts = await fetchProducts();
+    render(globalProducts);
+}
+
+// ==========================================
+// 4. RENDU & LOGIQUE "CATÉGORIES VIDES À LA FIN"
+// ==========================================
+function render(productsList) {
+    const allCatsDiv = document.getElementById('allCats');
+    allCatsDiv.innerHTML = '';
+
+    // RÈGLE : Calculer le nombre d'articles par catégorie pour ordonner
+    // Les catégories avec produits au début, les vides TOUT À LA FIN
+    const sortedCats = [...CATS].sort((a, b) => {
+        const countA = productsList.filter(p => p.categorie === a.id).length;
+        const countB = productsList.filter(p => p.categorie === b.id).length;
+        
+        if (countA > 0 && countB === 0) return -1; // a en premier
+        if (countA === 0 && countB > 0) return 1;  // b en premier
+        return 0;
+    });
+
+    // Création ordonnée des sections
+    sortedCats.forEach(c => {
+        const prodsInCat = productsList.filter(p => p.categorie === c.id);
+        const secDiv = document.createElement('div');
+        secDiv.id = `sec-${c.id}`;
+        
+        let contentHTML = `<h3 class="cat">${c.emoji} ${c.label} (${prodsInCat.length})</h3>`;
+        contentHTML += `<div class="products-grid" id="grid-${c.id}"></div>`;
+        secDiv.innerHTML = contentHTML;
+        allCatsDiv.appendChild(secDiv);
+
+        const grid = secDiv.querySelector(`#grid-${c.id}`);
+
+        if (prodsInCat.length === 0) {
+            secDiv.innerHTML += `<p class="empty-cat-note">Actuellement aucun article en stock dans cette catégorie.</p>`;
+        } else {
+            prodsInCat.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                const badgeHTML = p.badge ? `<div class="badge-rarete">${p.badge}</div>` : '';
+                const msgLink = `https://www.facebook.com/share/g/18YTkXrkvB/`;
+
+                card.innerHTML = `
+                    <button class="del" onclick="deleteProd('${p.id}')" title="Supprimer">✕</button>
+                    ${badgeHTML}
+                    <img src="${p.image}" onerror="this.src='https://via.placeholder.com/300?text=NO+IMAGE'">
+                    <h4>${p.nom}</h4>
+                    <div class="desc">${p.description || ''}</div>
+                    <div class="price">${p.prix} $</div>
+                    <button class="btn-reserver" onclick="window.open('${msgLink}')">⚡ RÉSERVER</button>
+                `;
+
+                // Effet 3D dynamique
+                card.addEventListener('mousemove', e => {
+                    const r = card.getBoundingClientRect();
+                    const x = e.clientX - r.left - r.width / 2;
+                    const y = e.clientY - r.top - r.height / 2;
+                    card.style.transform = `perspective(700px) rotateY(${x/12}deg) rotateX(${-y/12}deg) translateZ(20px) scale(1.05)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+
+                grid.appendChild(card);
+            });
+        }
+    });
+}
+
+// ==========================================
+// 5. NAVIGATION ET FILTRES
+// ==========================================
+function filterCat(catId) {
+    CATS.forEach(c => {
+        const el = document.getElementById(`sec-${c.id}`);
+        if (el) el.style.display = (c.id === catId) ? 'block' : 'none';
+    });
+    document.getElementById('mainTitle').innerText = `// ${catId.toUpperCase()} //`;
+    document.getElementById('backBtn').style.display = 'inline-block';
+    document.querySelectorAll('.pills-track button').forEach(b => {
+        b.classList.toggle('active', b.textContent.toLowerCase().includes(catId));
+    });
+    window.scrollTo({ top: document.getElementById('produits').offsetTop - 100, behavior: 'smooth' });
+}
+
+function showAll() {
+    CATS.forEach(c => {
+        const el = document.getElementById(`sec-${c.id}`);
+        if (el) el.style.display = 'block';
+    });
+    document.getElementById('mainTitle').innerText = 'INVENTAIRE NEON';
+    document.getElementById('backBtn').style.display = 'none';
+    document.querySelectorAll('.pills-track button').forEach(b => b.classList.remove('active'));
+}
+
+function searchProducts() {
+    const q = document.getElementById('searchProduct').value.toLowerCase();
+    if (!q) {
+        render(globalProducts);
         return;
     }
-
-    list.forEach(prod => {
-        const card = create3DCard(prod);
-        const target = document.getElementById(`grid-${prod.categorie}`);
-        if(target) target.appendChild(card);
-        else document.getElementById('grid-console').appendChild(card); // fallback
-    });
+    const filtered = globalProducts.filter(p => 
+        p.nom.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q))
+    );
+    render(filtered);
 }
 
-function create3DCard(p){
-    const div = document.createElement('div');
-    div.className = 'product-card';
-    div.dataset.id = p.id;
-    div.dataset.name = p.nom.toLowerCase();
-
-    // Couleur néon selon catégorie
-    const neon = {
-        xbox: '#107c10',
-        playstation: '#0070cc',
-        nintendo: '#e60012',
-        console: '#00f2ff',
-        pop: '#ff00e5',
-        film: '#ffcc00',
-        skylander: '#ff6a00'
-    }[p.categorie] || '#00f2ff';
-
-    div.style.borderColor = neon;
-    div.style.boxShadow = `0 0 20px ${neon}66, 0 15px 30px black`;
-
-    div.innerHTML = `
-        <div style="position:relative; transform-style:preserve-3d;">
-            <img src="${p.image_url}" alt="${p.nom}" loading="lazy">
-            <div class="card-glow" style="position:absolute; inset:0; background:radial-gradient(600px at var(--x,50%) var(--y,50%), ${neon}22, transparent 60%); pointer-events:none; transform:translateZ(10px);"></div>
-        </div>
-        <h4>${p.nom}</h4>
-        <p>${p.description || ''}</p>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; transform:translateZ(30px);">
-            <span style="color:${neon}; font-weight:800; text-shadow:0 0 10px ${neon};">${p.prix} $</span>
-            <span style="font-size:10px; opacity:0.6; border:1px solid ${neon}; padding:4px 8px;">${p.categorie.toUpperCase()}</span>
-        </div>
-        <div style="margin-top:10px; display:flex; gap:5px; transform:translateZ(20px);">
-            <input type="checkbox" class="chk" onchange="toggleSelect('${p.id}')" style="accent-color:${neon}">
-            <button onclick="deleteProduct('${p.id}')" style="background:transparent; border:1px solid red; color:red; padding:4px 8px; font-size:10px; cursor:pointer;">DELETE</button>
-        </div>
-    `;
-
-    // Effet 3D souris sur chaque carte
-    div.addEventListener('mousemove', (e)=>{
-        const rect = div.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        div.style.setProperty('--x', `${x}px`);
-        div.style.setProperty('--y', `${y}px`);
-        const rx = (y - rect.height/2) / 10;
-        const ry = (rect.width/2 - x) / 10;
-        div.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(20px) scale(1.05)`;
-    });
-    div.addEventListener('mouseleave', ()=>{
-        div.style.transform = `perspective(900px) rotateX(0) rotateY(0) translateZ(0) scale(1)`;
-    });
-
-    return div;
+function toggleMenu() {
+    document.getElementById('navMenu').classList.toggle('open');
 }
 
-// --- FILTRE CATÉGORIE 3D ---
-function filterByCategory(cat){
-    CATEGORIES.forEach(c=>{
-        const sec = document.getElementById(c);
-        if(sec) sec.style.display = (c === cat) ? 'block' : 'none';
-    });
-    document.getElementById('category-back-button').style.display = 'block';
-    document.getElementById('default-title').innerText = `// ${cat.toUpperCase()} //`;
-    window.scrollTo({top: document.getElementById('produits').offsetTop - 80, behavior:'smooth'});
-}
-
-function showAllCategories(){
-    CATEGORIES.forEach(c=>{
-        const sec = document.getElementById(c);
-        if(sec) sec.style.display = 'block';
-    });
-    document.getElementById('category-back-button').style.display = 'none';
-    document.getElementById('default-title').innerText = `INVENTAIRE // 3D VAULT`;
-}
-
-// --- RECHERCHE ---
-function searchProducts(){
-    const q = document.getElementById('searchProduct').value.toLowerCase();
-    if(!q){ renderAll(); return; }
-    const filtered = allProducts.filter(p => p.nom.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)));
-    renderAll(filtered);
-}
-
-// --- MENU ---
-function toggleMenu(){
-    const m = document.getElementById('navMenu');
-    m.classList.toggle('open');
-    m.style.display = m.classList.contains('open') ? 'flex' : 'none';
-}
-function toggleCatalogue(){
+function toggleCatalogue() {
     document.getElementById('catContent').classList.toggle('open');
 }
 
-// --- AJOUT PRODUIT ---
-function setupPreview(){
-    const input = document.getElementById('imageProduit');
-    if(!input) return;
-    input.addEventListener('change', e=>{
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = ev=>{
-            document.getElementById('imagePreview').src = ev.target.result;
-            document.getElementById('preview-container').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    });
-
-    document.getElementById('formAjoutProduit').addEventListener('submit', async (e)=>{
-        e.preventDefault();
-        const file = input.files[0];
-        if(!file) return alert('Photo manquante');
-
-        const fileName = `${Date.now()}_${file.name}`;
-        const { error: upErr } = await supabaseClient.storage.from('images').upload(fileName, file);
-        if(upErr) return alert('Erreur upload: '+upErr.message);
-
-        const { data } = supabaseClient.storage.from('images').getPublicUrl(fileName);
-
-        const newProd = {
-            nom: document.getElementById('nomProduit').value,
-            description: document.getElementById('descProduit').value,
-            prix: parseFloat(document.getElementById('prixProduit').value),
-            categorie: document.getElementById('categorieProduit').value,
-            image_url: data.publicUrl
-        };
-
-        const { error } = await supabaseClient.from('produits').insert([newProd]);
-        if(error) alert(error.message);
-        else { alert('PRODUIT AJOUTÉ EN 3D !'); e.target.reset(); document.getElementById('preview-container').style.display='none'; loadProducts(); }
-    });
-}
-
-// --- SUPPRESSION ---
-function toggleSelect(id){
-    if(selectedProducts.has(id)) selectedProducts.delete(id);
-    else selectedProducts.add(id);
-    document.getElementById('btn-bulk-delete').style.display = selectedProducts.size > 0 ? 'inline-block' : 'none';
-}
-async function deleteProduct(id){
-    if(!confirm('DELETE THIS ITEM ?')) return;
-    await supabaseClient.from('produits').delete().eq('id', id);
-    loadProducts();
-}
-async function deleteSelectedProducts(){
-    if(selectedProducts.size === 0) return;
-    if(!confirm(`Supprimer ${selectedProducts.size} produits ?`)) return;
-    for(let id of selectedProducts){
-        await supabaseClient.from('produits').delete().eq('id', id);
+// ==========================================
+// 6. GESTION DE L'ADMINISTRATION (CODE: 200511)
+// ==========================================
+function checkAdminAccess() {
+    if (isAdminLoggedIn) return true;
+    const code = prompt("Veuillez saisir le code administrateur :");
+    if (code === ADMIN_CODE) {
+        isAdminLoggedIn = true;
+        return true;
+    } else {
+        alert("Code administrateur incorrect !");
+        return false;
     }
-    selectedProducts.clear();
-    loadProducts();
 }
 
-// --- ADMIN PIN ---
-function verifierPin(){
-    const pin = document.getElementById('inputPin').value;
-    if(pin === '123456'){ // CHANGE TON PIN ICI
-        document.getElementById('admin').style.display = 'block';
-        document.getElementById('popupPin').style.display = 'none';
-        document.getElementById('admin').scrollIntoView({behavior:'smooth'});
-    } else alert('PIN FAUX');
+function openAdmin() {
+    if (!checkAdminAccess()) return;
+    document.getElementById('popupAdmin').style.display = 'flex';
+}
+
+function closeAdmin() {
+    document.getElementById('popupAdmin').style.display = 'none';
+}
+
+// Prévisualisation d'image
+document.getElementById('img').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = document.getElementById('preview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
+// Ajouter un produit dans Supabase (Nouveau élément en tête)
+async function addProduct() {
+    const nom = document.getElementById('nom').value.trim();
+    const desc = document.getElementById('desc').value.trim();
+    const prix = parseFloat(document.getElementById('prix').value);
+    const cat = document.getElementById('cat').value;
+    const preview = document.getElementById('preview').src;
+
+    if (!nom || !cat || isNaN(prix)) {
+        alert('Veuillez remplir le Nom, la Catégorie et un Prix valide.');
+        return;
     }
+
+    const imgSrc = preview || ('https://via.placeholder.com/400?text=' + encodeURIComponent(nom));
+
+    const newProduct = {
+        nom,
+        badge: 'NOUVEAU',
+        description: desc,
+        prix,
+        categorie: cat,
+        image: imgSrc,
+        created_at: new Date().toISOString()
+    };
+
+    try {
+        const { error } = await supabaseClient
+            .from('produits')
+            .insert([newProduct]);
+
+        if (error) throw error;
+        alert("Produit ajouté avec succès sur Supabase !");
+    } catch (err) {
+        console.warn("Supabase local fallback: ", err.message);
+        // Sauvegarde de secours en LocalStorage
+        globalProducts.unshift({ id: Date.now().toString(), ...newProduct });
+        localStorage.setItem('bazarNobsy_3D', JSON.stringify(globalProducts));
+    }
+
+    // Réinitialisation des champs du formulaire
+    document.getElementById('nom').value = '';
+    document.getElementById('desc').value = '';
+    document.getElementById('prix').value = '';
+    document.getElementById('cat').value = '';
+    document.getElementById('img').value = '';
+    document.getElementById('preview').style.display = 'none';
+
+    closeAdmin();
+    await reloadAndRender();
+}
+
+// Supprimer un produit
+async function deleteProd(id) {
+    if (!checkAdminAccess()) return;
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('produits')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+    } catch (err) {
+        console.warn("Supabase local delete fallback:", err.message);
+        globalProducts = globalProducts.filter(p => String(p.id) !== String(id));
+        localStorage.setItem('bazarNobsy_3D', JSON.stringify(globalProducts));
+    }
+
+    await reloadAndRender();
+}
+
+// Lancement au chargement
+init();
