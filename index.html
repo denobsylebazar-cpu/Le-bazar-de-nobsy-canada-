@@ -86,6 +86,20 @@
     <!-- BOUTON FLOTTANT ADMIN -->
     <button id="btnAdmin" onclick="openAdmin()" title="Espace Administrateur">⚙️</button>
 
+    <!-- FENÊTRE GAMING CODE ADMIN SÉCURISÉ -->
+    <div id="modalCodeAdmin" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:200;justify-content:center;align-items:center;padding:15px;">
+        <div class="popup-code-gaming">
+            <div style="font-size:30px;margin-bottom:8px;">🔒</div>
+            <h3>ACCÈS ADMINISTRATEUR</h3>
+            <p>Veuillez entrer le code de sécurité :</p>
+            <input type="password" id="adminCodeInput" placeholder="••••••" maxlength="15" autocomplete="off">
+            <div class="code-modal-btns">
+                <button class="btn-valider-code" onclick="submitAdminCode()">DÉVERROUILLER</button>
+                <button class="btn-annuler-code" onclick="closeAdminCodeModal()">ANNULER</button>
+            </div>
+        </div>
+    </div>
+
     <!-- POPUP ADMIN CONFORME À VOTRE PHOTO -->
     <div id="popupAdmin">
         <div class="popup" style="max-width:540px;width:95%;max-height:90vh;overflow-y:auto;border-radius:18px;">
