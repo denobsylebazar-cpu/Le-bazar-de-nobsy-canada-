@@ -764,3 +764,90 @@ body::after {
 .badge-rarete {
     display: none !important;
 }
+/* ========================================================
+   ADAPTATION POUR ORDINATEUR (RESPONSIVE PC & ÉCRANS LARGES)
+======================================================== */
+@media (min-width: 768px) {
+
+    /* 1. MENU DU HAUT : Les liens s'affichent en ligne et le burger disparaît */
+    .hamburger-shot {
+        display: none !important; /* Cache les 3 traits sur PC */
+    }
+
+    .nav-menu {
+        display: flex !important; /* Affiche les liens directement */
+        position: static !important;
+        flex-direction: row !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        gap: 12px;
+    }
+
+    .nav-menu a {
+        padding: 8px 14px !important;
+        font-size: 11px !important;
+        border: 1px solid rgba(0, 242, 255, 0.3);
+        transition: 0.2s;
+    }
+
+    .nav-menu a:hover {
+        background: #00f2ff;
+        color: #000;
+        box-shadow: 0 0 15px #00f2ff;
+    }
+
+    .search-shot {
+        max-width: 350px !important;
+    }
+
+    /* 2. CADRE D'ACCUEIL GRAND FORMAT (LARGEUR ADAPTÉE AU PC) */
+    .hero-card {
+        max-width: 1050px !important; /* Plus de blocage étroit à 620px */
+        min-height: 480px !important;
+    }
+
+    .hero-card-content {
+        padding: 50px 60px !important;
+    }
+
+    .hero-card-content h1 {
+        font-size: 46px !important; /* Titre plus grand et impressionnant */
+        line-height: 1.15 !important;
+    }
+
+    .hero-card-content p {
+        font-size: 16px !important;
+        margin: 20px 0 30px !important;
+    }
+
+    /* 3. GRILLE DE PRODUITS ÉLARGIE (3 À 4 PRODUITS PAR LIGNE SUR PC) */
+    .products-grid {
+        max-width: 1350px;
+        margin: 0 auto;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+        gap: 25px !important;
+        padding: 0 30px 40px !important;
+    }
+
+    /* 4. EXPLORATEUR DE CATÉGORIES PLUS LARGE (4 COLONNES AU LIEU DE 2) */
+    .explore-btn {
+        max-width: 950px !important;
+        font-size: 15px !important;
+    }
+
+    .catalogue-content {
+        max-width: 950px !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+
+    /* 5. CARTE GOOGLE MAPS ÉLARGIE */
+    .map-card {
+        max-width: 950px !important;
+    }
+
+    .map-card iframe {
+        height: 420px !important;
+    }
+}
