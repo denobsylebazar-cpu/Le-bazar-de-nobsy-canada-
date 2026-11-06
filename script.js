@@ -239,10 +239,6 @@ async function openAdmin() {
     renderAdminTable();
 }
 
-function closeAdmin() { 
-    document.getElementById('popupAdmin').style.display = 'none'; 
-}
-
 // Prévisualisation d'image
 document.getElementById('img').addEventListener('change', e => {
     const file = e.target.files[0];
@@ -426,11 +422,12 @@ async function deleteSingleProd(id) {
     await reloadAndRender();
 }
 
-// Lancement au chargement de la page
-init();
 // FERMETURE DE L'ADMIN & DISPARITION DES 'X' (REMPLACEMENT)
 function closeAdmin() { 
     document.getElementById('popupAdmin').style.display = 'none'; 
     isAdminLoggedIn = false; // Déconnecte l'administrateur
     render(globalProducts);  // Fait disparaître tous les 'X' des cartes immédiatement
 }
+
+// Lancement au chargement de la page
+init();
