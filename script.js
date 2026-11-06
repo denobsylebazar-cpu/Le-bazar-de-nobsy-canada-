@@ -15,9 +15,7 @@ const CATS = [
     { id: 'playstation', label: 'PLAYSTATION', emoji: '🕹️' },
     { id: 'nintendo', label: 'NINTENDO', emoji: '🍄' },
     { id: 'console', label: 'CONSOLES', emoji: '📦' },
-    { id: 'pop', label: 'FUNKO POP', emoji: '🧸' },
-    { id: 'film', label: 'FILMS', emoji: '🎬' },
-    { id: 'skylander', label: 'SKYLANDERS', emoji: '🌀' }
+    { id: 'film', label: 'FILMS', emoji: '🎬' }
 ];
 
 // ==========================================
